@@ -39,7 +39,6 @@ public class StudentController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Student> update(@PathVariable Long id, @RequestBody Student student) {
-        // Аналогично можно добавить проверку на существование перед обновлением
         Student updated = studentService.update(id, student);
         if (updated == null) {
             return ResponseEntity.notFound().build();

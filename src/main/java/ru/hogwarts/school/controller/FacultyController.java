@@ -1,16 +1,16 @@
 package ru.hogwarts.school.controller;
 
-import org.apache.catalina.util.ParameterMap;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.service.FacultyService;
 
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.List;
 
 @RestController
 @RequestMapping("/faculty")
 public class FacultyController {
+
     private final FacultyService facultyService;
 
     public FacultyController(FacultyService facultyService) {
@@ -18,13 +18,14 @@ public class FacultyController {
     }
 
     @GetMapping
-    public Map<Long, Faculty> getAll() {
+    public List<Faculty> getAll() {
         return facultyService.getAll();
     }
 
     @GetMapping("/{id}")
-    public Faculty getById(@PathVariable Long id) {
-        return facultyService.get(id);
+    public ResponseEntity<Faculty> getById(@PathVariable Long id) {
+        Faculty faculty = facultyService.getById(id);
+        return ResponseEntity.ok(faculty);
     }
 
     @PostMapping
@@ -38,15 +39,13 @@ public class FacultyController {
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
         facultyService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/color/{color}")
-    public Map<Long, Faculty> filterByColor(@PathVariable String color) {
-        return facultyService.getAll().entrySet()
-                .stream()
-                .filter(e -> e.getValue().getColor().equalsIgnoreCase(color))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    public List<Faculty> filterByColor(@PathVariable String color) {
+        return facultyService.getByColor(color);
     }
 }
