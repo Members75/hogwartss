@@ -1,15 +1,17 @@
 package ru.hogwarts.school.controller;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import ru.hogwarts.school.model.Student;
+import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.service.StudentService;
 
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.List;
 
 @RestController
-@RequestMapping("/student")
+@RequestMapping("/students")
 public class StudentController {
 
     private final StudentService studentService;
@@ -19,51 +21,59 @@ public class StudentController {
     }
 
     @GetMapping
-    public Map<Long, Student> getAll() {
-        return studentService.getAll();
+    public List<Student> getAllStudents() {
+        return studentService.getAllStudents();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Student> getById(@PathVariable Long id) {
-        Student student = studentService.get(id);
-        if (student == null) {
-            return ResponseEntity.notFound().build();
+    public ResponseEntity<Student> getStudentById(@PathVariable Long id) {
+        try {
+            return ResponseEntity.ok(studentService.getStudentById(id));
+        } catch (ResponseStatusException e) {
+            if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
+                return ResponseEntity.notFound().build();
+            }
+            throw e;
         }
-        return ResponseEntity.ok(student);
     }
 
     @PostMapping
-    public Student create(@RequestBody Student student) {
-        return studentService.create(student);
+    public ResponseEntity<Student> createStudent(@RequestBody Student student) {
+        Student created = studentService.saveStudent(student);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Student> update(@PathVariable Long id, @RequestBody Student student) {
-        Student updated = studentService.update(id, student);
-        if (updated == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(updated);
+    public ResponseEntity<Student> updateStudent(@PathVariable Long id, @RequestBody Student student) {
+        student.setId(id);
+        return ResponseEntity.ok(studentService.saveStudent(student));
     }
 
     @DeleteMapping("/{id}")
-    @ResponseStatus(org.springframework.http.HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable Long id) {
-        studentService.delete(id);
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteStudent(@PathVariable Long id) {
+        studentService.deleteStudent(id);
     }
 
-    @GetMapping("/age/{age}")
-    public Map<Long, Student> filterByAge(@PathVariable Integer age) {
-        return studentService.getAll().entrySet()
-                .stream()
-                .filter(e -> {
-                    Integer studentAge = e.getValue().getAge();
-                    return studentAge != null && studentAge.equals(age);
-                })
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        Map.Entry::getValue,
-                        (existing, replacement) -> existing
-                ));
+    @GetMapping("/age-range")
+    public List<Student> getStudentsByAgeRange(
+            @RequestParam int min,
+            @RequestParam int max) {
+        return studentService.getStudentsByAgeRange(min, max);
+    }
+
+    @GetMapping("/{id}/faculty")
+    public ResponseEntity<?> getStudentFaculty(@PathVariable Long id) {
+        try {
+            Student student = studentService.getStudentById(id);
+            Faculty faculty = student.getFaculty();
+
+            if (faculty == null) {
+                return ResponseEntity.notFound().build();
+            }
+            return ResponseEntity.ok(faculty);
+        } catch (org.springframework.web.server.ResponseStatusException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 }

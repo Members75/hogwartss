@@ -1,14 +1,17 @@
 package ru.hogwarts.school.controller;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import ru.hogwarts.school.model.Faculty;
+import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.service.FacultyService;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/faculty")
+@RequestMapping("/faculties") // множественное число — общепринятая практика
 public class FacultyController {
 
     private final FacultyService facultyService;
@@ -18,34 +21,57 @@ public class FacultyController {
     }
 
     @GetMapping
-    public List<Faculty> getAll() {
-        return facultyService.getAll();
+    public List<Faculty> getAllFaculties() {
+        return facultyService.getAllFaculties();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Faculty> getById(@PathVariable Long id) {
-        Faculty faculty = facultyService.getById(id);
-        return ResponseEntity.ok(faculty);
+    public ResponseEntity<Faculty> getFacultyById(@PathVariable Long id) {
+        try {
+            Faculty faculty = facultyService.getFacultyById(id);
+            return ResponseEntity.ok(faculty);
+        } catch (ResponseStatusException e) {
+            if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
+                return ResponseEntity.notFound().build();
+            }
+            throw e;
+        }
     }
 
     @PostMapping
-    public Faculty create(@RequestBody Faculty faculty) {
-        return facultyService.create(faculty);
+    public ResponseEntity<Faculty> createFaculty(@RequestBody Faculty faculty) {
+        Faculty created = facultyService.saveFaculty(faculty);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @PutMapping("/{id}")
-    public Faculty update(@PathVariable Long id, @RequestBody Faculty faculty) {
-        return facultyService.update(id, faculty);
+    public ResponseEntity<Faculty> updateFaculty(@PathVariable Long id, @RequestBody Faculty faculty) {
+        faculty.setId(id);
+        Faculty updated = facultyService.saveFaculty(faculty);
+        return ResponseEntity.ok(updated);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        facultyService.delete(id);
-        return ResponseEntity.noContent().build();
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteFaculty(@PathVariable Long id) {
+        facultyService.deleteFaculty(id);
     }
 
-    @GetMapping("/color/{color}")
-    public List<Faculty> filterByColor(@PathVariable String color) {
-        return facultyService.getByColor(color);
+    @GetMapping("/search")
+    public List<Faculty> searchFaculties(@RequestParam String q) {
+        return facultyService.searchFaculties(q);
+    }
+
+    @GetMapping("/{id}/students")
+    public ResponseEntity<List<Student>> getFacultyStudents(@PathVariable Long id) {
+        try {
+            Faculty faculty = facultyService.getFacultyById(id);
+            return ResponseEntity.ok(faculty.getStudents());
+        } catch (ResponseStatusException e) {
+            if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
+                return ResponseEntity.notFound().build();
+            }
+            throw e;
+        }
     }
 }

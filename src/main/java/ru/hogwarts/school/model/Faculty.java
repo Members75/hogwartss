@@ -1,6 +1,10 @@
 package ru.hogwarts.school.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "faculties")
@@ -13,6 +17,9 @@ public class Faculty {
 
     public Faculty() {
     }
+    @OneToMany(mappedBy = "faculty", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private List<Student> students = new ArrayList<>();
 
     public Faculty(Long id, String name, String color) {
         this.id = id;
@@ -42,5 +49,9 @@ public class Faculty {
 
     public void setColor(String color) {
         this.color = color;
+    }
+
+    public List<Student> getStudents() {
+        return null;
     }
 }
