@@ -27,6 +27,14 @@ public class FacultyService {
                         HttpStatus.NOT_FOUND, "Faculty not found with id: " + id));
     }
 
+    public Faculty getFacultyWithStudents(Long id) {
+        Faculty faculty = facultyRepository.findByIdWithStudents(id);
+        if (faculty == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Faculty not found with id: " + id);
+        }
+        return faculty;
+    }
+
     public List<Faculty> getAllFaculties() {
         return facultyRepository.findAll();
     }
@@ -40,6 +48,7 @@ public class FacultyService {
     }
 
     public List<Faculty> searchFaculties(String keyword) {
-        return facultyRepository.findByNameContainingIgnoreCaseOrColorContainingIgnoreCase(keyword, keyword);
+
+        return facultyRepository.findByNameContainingIgnoreCase(keyword);
     }
 }

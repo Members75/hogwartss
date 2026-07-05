@@ -7,7 +7,6 @@ import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.repository.StudentRepository;
 
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class StudentService {
@@ -24,7 +23,16 @@ public class StudentService {
 
     public Student getStudentById(Long id) {
         return studentRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Student not found with id: " + id));
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Student not found with id: " + id));
+    }
+
+    public Student getStudentWithFaculty(Long id) {
+        Student student = studentRepository.findByIdWithFaculty(id);
+        if (student == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Student not found with id: " + id);
+        }
+        return student;
     }
 
     public List<Student> getAllStudents() {
@@ -33,7 +41,8 @@ public class StudentService {
 
     public void deleteStudent(Long id) {
         if (!studentRepository.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Student not found with id: " + id);
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "Student not found with id: " + id);
         }
         studentRepository.deleteById(id);
     }
@@ -43,25 +52,5 @@ public class StudentService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "minAge cannot be greater than maxAge");
         }
         return studentRepository.findByAgeBetween(minAge, maxAge);
-    }
-
-    public Map<Long, Student> getAll() {
-        return null;
-    }
-
-    public Student get(Long id) {
-        return null;
-    }
-
-    public Student create(Student student) {
-        return null;
-    }
-
-    public Student update(Long id, Student student) {
-        return null;
-    }
-
-    public void delete(Long id) {
-
     }
 }
