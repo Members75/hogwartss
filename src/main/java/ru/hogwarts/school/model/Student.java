@@ -14,7 +14,7 @@ public class Student {
     public Student() {
     }
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "faculty_id")
     private Faculty faculty;
 
@@ -49,6 +49,8 @@ public class Student {
     }
 
     public Faculty getFaculty() {
-        return null;
+        return faculty;
     }
+
+    public Faculty setFaculty() { return faculty; }
 }

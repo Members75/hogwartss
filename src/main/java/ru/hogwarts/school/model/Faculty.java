@@ -17,6 +17,7 @@ public class Faculty {
 
     public Faculty() {
     }
+
     @OneToMany(mappedBy = "faculty", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<Student> students = new ArrayList<>();
@@ -52,6 +53,10 @@ public class Faculty {
     }
 
     public List<Student> getStudents() {
-        return null;
+        return students;
+    }
+
+    public void setStudents(List<Student> students) {
+        this.students = students;
     }
 }
