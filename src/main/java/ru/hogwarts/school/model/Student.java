@@ -24,6 +24,17 @@ public class Student {
         this.age = age;
     }
 
+    @OneToOne(mappedBy = "student", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Avatar avatar;
+
+    public Avatar getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(Avatar avatar) {
+        this.avatar = avatar;
+    }
+
     public Long getId() {
         return id;
     }
@@ -52,5 +63,7 @@ public class Student {
         return faculty;
     }
 
-    public Faculty setFaculty() { return faculty; }
+    public Faculty setFaculty() {
+        return faculty;
+    }
 }
