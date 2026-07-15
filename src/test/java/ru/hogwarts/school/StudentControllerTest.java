@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import ru.hogwarts.school.model.Student;
@@ -96,12 +98,17 @@ class StudentControllerTest {
                 getUrl("/students"), toCreate, Student.class);
         Long id = createResp.getBody().getId();
 
-        Student updateDto = new Student();
-        updateDto.setName("Hermione Granger Updated");
-        updateDto.setAge(12);
+        Student student = new Student();
+        student.setName("Hermione Granger Updated");
+        student.setAge(12);
 
-        ResponseEntity<Student> response = restTemplate.putForEntity(
-                getUrl("/students/" + id), updateDto, Student.class);
+        HttpEntity<Student> request = new HttpEntity<>(student);
+        ResponseEntity<Student> response = restTemplate.exchange(
+                "/students/1",
+                HttpMethod.PUT,
+                request,
+                Student.class
+        );
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals("Hermione Granger Updated", response.getBody().getName());
