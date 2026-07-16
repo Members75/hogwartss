@@ -1,12 +1,16 @@
 package ru.hogwarts.school.controller;
 
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.hogwarts.school.model.Avatar;
+import ru.hogwarts.school.repository.AvatarRepository;
 import ru.hogwarts.school.service.AvatarService;
 
 import java.io.IOException;
@@ -16,6 +20,7 @@ import java.io.IOException;
 public class AvatarController {
 
     private final AvatarService avatarService;
+    private AvatarRepository avatarRepository;
 
     public AvatarController(AvatarService avatarService) {
         this.avatarService = avatarService;
@@ -30,6 +35,7 @@ public class AvatarController {
         Avatar avatar = avatarService.uploadAvatar(studentId, file);
         return ResponseEntity.ok(avatar);
     }
+
 
     @GetMapping("/db/{avatarId}")
     public ResponseEntity<Resource> getAvatarFromDb(@PathVariable Long avatarId) {
@@ -48,4 +54,17 @@ public class AvatarController {
                 .contentType(MediaType.parseMediaType(contentType))
                 .body(resource);
     }
-}
+
+    @GetMapping
+    public ResponseEntity<Page<Avatar>> getAllAvatars(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Avatar> avatars = avatarRepository.findAll(pageable);
+
+        return ResponseEntity.ok(avatars);
+    }
+
+
+    }

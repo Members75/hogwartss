@@ -55,7 +55,8 @@ class FacultyControllerWebMvcTest {
 
         mockMvc.perform(MockMvcRequestBuilders.get("/faculties/1"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("Ravenclaw"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("Ravenclaw"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1));
     }
 
     @Test
@@ -79,7 +80,7 @@ class FacultyControllerWebMvcTest {
 
         when(facultyService.saveFaculty(any(Faculty.class))).thenAnswer(inv -> {
             Faculty f = inv.getArgument(0);
-            f.setId(2L); // эмуляция автоинкремента
+            f.setId(2L);
             return f;
         });
 
@@ -88,12 +89,12 @@ class FacultyControllerWebMvcTest {
                         .content(payload))
                 .andExpect(MockMvcResultMatchers.status().isCreated())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("Slytherin"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.color").value("Green"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(2));
     }
 
     @Test
     void testUpdateFaculty() throws Exception {
-        // PUT /faculties/{id} в контроллере делает faculty.setId(id) и вызывает saveFaculty
         String payload = """
                 {
                     "name": "Ravenclaw Updated",
@@ -103,7 +104,6 @@ class FacultyControllerWebMvcTest {
 
         when(facultyService.saveFaculty(any(Faculty.class))).thenAnswer(inv -> {
             Faculty f = inv.getArgument(0);
-            // id уже установлен контроллером, но можно убедиться
             return f;
         });
 
@@ -111,7 +111,8 @@ class FacultyControllerWebMvcTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(payload))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("Ravenclaw Updated"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("Ravenclaw Updated"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.color").value("Navy"));
     }
 
     @Test

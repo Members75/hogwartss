@@ -2,6 +2,9 @@ package ru.hogwarts.school.service;
 
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.UrlResource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ru.hogwarts.school.model.Avatar;
@@ -59,6 +62,11 @@ public class AvatarService {
                 .orElseThrow(() -> new IllegalArgumentException("Аватар не найден"));
 
         return new ByteArrayResource(avatar.getData());
+    }
+
+    public Page<Avatar> getAllAvatarsPage(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return avatarRepository.findAll(pageable);
     }
 
     public UrlResource getAvatarFromDisk(String filePath) throws IOException {

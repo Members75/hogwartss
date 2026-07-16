@@ -18,12 +18,10 @@ repositories {
 }
 
 dependencies {
-    // ✅ Используем обычный web, он включает MVC
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     runtimeOnly 'org.postgresql:postgresql'
 
-    // ✅ Только один правильный стартер для тестов
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
