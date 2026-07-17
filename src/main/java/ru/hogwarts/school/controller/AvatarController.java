@@ -20,7 +20,6 @@ import java.io.IOException;
 public class AvatarController {
 
     private final AvatarService avatarService;
-    private AvatarRepository avatarRepository;
 
     public AvatarController(AvatarService avatarService) {
         this.avatarService = avatarService;
@@ -61,8 +60,7 @@ public class AvatarController {
             @RequestParam(defaultValue = "10") int size) {
 
         Pageable pageable = PageRequest.of(page, size);
-        Page<Avatar> avatars = avatarRepository.findAll(pageable);
-
+        Page<Avatar> avatars = avatarService.getAllAvatarsPage(pageable);
         return ResponseEntity.ok(avatars);
     }
 

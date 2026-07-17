@@ -64,8 +64,7 @@ public class AvatarService {
         return new ByteArrayResource(avatar.getData());
     }
 
-    public Page<Avatar> getAllAvatarsPage(int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
+    public Page<Avatar> getAllAvatarsPage(Pageable pageable) {
         return avatarRepository.findAll(pageable);
     }
 
