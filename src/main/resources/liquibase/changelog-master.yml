@@ -1,0 +1,5 @@
+databaseChangeLog:
+  - include:
+      file: db.changelog-student-index.yml
+  - include:
+      file: db.changelog-faculty-index.yml
